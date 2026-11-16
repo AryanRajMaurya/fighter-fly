@@ -49,6 +49,7 @@ bun build src/app.ts --target browser --outfile app.js
 
 ## Credits
 
-Scene code and jet model are from the UI8 Forge fragment "fighter"
-(`frag_1eb8944c-57b1-42ca-a909-5c2d7e517c24`). Rebuilt as a standalone page.
-Not affiliated with UI8.
+Inspired by the UI8 Forge fragment **"fighter"** by its original author —
+scene code and jet model are used unchanged from
+[forge.ui8.ai/share/frag_1eb8944c-57b1-42ca-a909-5c2d7e517c24](https://forge.ui8.ai/share/frag_1eb8944c-57b1-42ca-a909-5c2d7e517c24).
+Rebuilt here as a standalone page; not affiliated with UI8.
