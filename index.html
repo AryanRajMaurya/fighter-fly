@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>fighter · fly</title>
+<meta name="description" content="Pixel-art fighter jet built by sprite stacking, over stacked islands. Space cycles overhead, chase and cockpit views; click rolls, hold fires the thrusters." />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="scene" tabindex="0" aria-label="A pixel-art fighter jet, built from stacked slices, flying over islands.">
+    <canvas id="view" role="img"></canvas>
+    <canvas id="fire" aria-hidden="true"></canvas>
+
+    <div id="hint-wrap" class="hint-wrap bottom">
+      <p id="hint"></p>
+    </div>
+
+    <div id="touch-ui">
+      <button id="view-btn" type="button" aria-label="Change view">View</button>
+      <button id="boost" type="button" aria-label="Thrusters: hold to fire" aria-pressed="false">Boost</button>
+    </div>
+  </div>
+
+  <header id="top">
+    <div class="brand">
+      <span class="name">fighter</span>
+      <span class="sub">Fighter jet scene</span>
+    </div>
+    <button id="panel-toggle" type="button" aria-label="Toggle controls">Controls</button>
+  </header>
+
+  <aside id="panel" aria-label="Scene controls">
+    <div id="panel-head">
+      <span>Fighter jet scene</span>
+      <button id="panel-close" type="button" aria-label="Close controls">×</button>
+    </div>
+    <div id="panel-body"></div>
+  </aside>
+
+  <script>
+    // collect runtime errors so a headless check can read them
+    window.__errs = []
+    window.addEventListener('error', (e) => window.__errs.push(String(e.message || e.error)))
+    window.addEventListener('unhandledrejection', (e) => window.__errs.push('rejection: ' + String(e.reason)))
+  </script>
+  <script src="./app.js"></script>
+</body>
+</html>
