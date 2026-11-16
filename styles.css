@@ -134,7 +134,7 @@ body.touch #touch-ui { display: block; }
   border-bottom: 1px solid rgba(244, 244, 244, 0.18);
 }
 #credit a:hover { color: #fff; border-bottom-color: rgba(255, 255, 255, 0.5); }
-#panel-toggle {
+#panel-toggle, #fs {
   pointer-events: auto;
   height: 32px;
   padding: 0 12px;
@@ -146,7 +146,19 @@ body.touch #touch-ui { display: block; }
   cursor: pointer;
   backdrop-filter: blur(6px);
 }
-#panel-toggle:hover { border-color: rgba(244, 244, 244, 0.2); }
+#fs { margin-left: 6px; }
+#panel-toggle:hover, #fs:hover { border-color: rgba(244, 244, 244, 0.2); }
+
+/* ── boot cover ────────────────────────────────────────────────────── */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #141414;
+  z-index: 20;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+#boot.gone { opacity: 0; }
 
 /* ── the control panel ─────────────────────────────────────────────── */
 #panel {
@@ -191,6 +203,33 @@ body.panel-open #panel { transform: translateX(0); }
   overflow-y: auto;
   flex: 1;
 }
+
+#panel-foot {
+  border-top: 1px solid var(--line);
+  padding: 10px 14px 14px;
+}
+#reset {
+  width: 100%;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: #191919;
+  color: var(--ink);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+#reset:hover { border-color: rgba(244, 244, 244, 0.2); }
+#panel-foot .keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 10px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+#panel-foot .keys b { color: var(--ink-dim); font-weight: 500; }
+#panel-foot .share { margin: 8px 0 0; font-size: 10.5px; color: var(--ink-faint); }
 
 #panel-body h3 {
   margin: 18px 0 8px;
@@ -302,4 +341,21 @@ body.panel-open #panel { transform: translateX(0); }
 @media (max-width: 640px) {
   #top .sub { display: none; }
   .hint-wrap p { font-size: 9.5px; letter-spacing: 0.1em; }
+
+  /* the panel becomes a bottom sheet */
+  #panel {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-width: none;
+    height: 68vh;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 14px 14px 0 0;
+    transform: translateY(100%);
+  }
+  body.panel-open #panel { transform: translateY(0); }
+  #credit { top: 54px; left: 12px; }
 }

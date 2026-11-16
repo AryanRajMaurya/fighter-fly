@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>fighter · fly</title>
 <meta name="description" content="Pixel-art fighter jet built by sprite stacking, over stacked islands. Space cycles overhead, chase and cockpit views; click rolls, hold fires the thrusters." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="fighter · fly" />
+<meta property="og:description" content="A pixel-art fighter jet built by sprite stacking, flying over stacked islands. Rebuilt from the UI8 Forge fragment." />
+<meta property="og:image" content="./og.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%232468b4'/><path d='M3 11l6-6 4 3-6 2z' fill='%23f0580e'/></svg>" />
 <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <div id="boot"></div>
   <div id="scene" tabindex="0" aria-label="A pixel-art fighter jet, built from stacked slices, flying over islands.">
     <canvas id="view" role="img"></canvas>
     <canvas id="fire" aria-hidden="true"></canvas>
@@ -28,6 +35,7 @@
       <span class="sub">Fighter jet scene</span>
     </div>
     <button id="panel-toggle" type="button" aria-label="Toggle controls">Controls</button>
+    <button id="fs" type="button" aria-label="Toggle fullscreen">Full</button>
   </header>
 
   <div id="credit">
@@ -41,6 +49,14 @@
       <button id="panel-close" type="button" aria-label="Close controls">×</button>
     </div>
     <div id="panel-body"></div>
+    <div id="panel-foot">
+      <button id="reset" type="button">Reset to original look</button>
+      <p class="keys">
+        <span><b>Space</b> view</span><span><b>Click</b> roll</span><span><b>Hold</b> thrusters</span>
+        <span><b>F</b> full</span><span><b>R</b> reset</span><span><b>H</b> panel</span>
+      </p>
+      <p class="share">Settings live in the URL — copy it to share this look.</p>
+    </div>
   </aside>
 
   <script>

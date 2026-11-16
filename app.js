@@ -1,4 +1,4 @@
-// ../workspace/fly-clone/src/lib/jet-model.ts
+// src/lib/jet-model.ts
 var JET_W = 34;
 var JET_L = 46;
 var JET_H = 13;
@@ -104,7 +104,7 @@ function decodeJet() {
   return slices;
 }
 
-// ../workspace/fly-clone/src/lib/cockpit.ts
+// src/lib/cockpit.ts
 var rgb = (r, g, b) => (255 << 24 | b << 16 | g << 8 | r) >>> 0;
 var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 var CRT = [rgb(3, 20, 13), rgb(5, 34, 22), rgb(10, 66, 40), rgb(22, 150, 78), rgb(70, 226, 126), rgb(186, 255, 210)];
@@ -1263,7 +1263,7 @@ function drawCockpit(fb, art, live) {
   lay(fb, art, art.rear, oRear.x, oRear.y, oRear.f, -art.pad, art.rearBottom + 1, null);
 }
 
-// ../workspace/fly-clone/src/lib/scene.ts
+// src/lib/scene.ts
 var DEFAULT_PARAMS = {
   speed: 92,
   boost: 1.8,
@@ -3348,7 +3348,7 @@ function createScene(initial) {
   };
 }
 
-// ../workspace/fly-clone/src/lib/flame-layer.ts
+// src/lib/flame-layer.ts
 var FLAME_F2 = 16;
 var VERT = `
 attribute vec2 p;
@@ -3588,7 +3588,7 @@ function createFlameLayer(canvas) {
   };
 }
 
-// ../workspace/fly-clone/src/story.ts
+// src/story.ts
 var STORY = [
   {
     title: "Helpers",
@@ -3907,7 +3907,7 @@ var STORY = [
   }
 ];
 
-// ../workspace/fly-clone/src/app.ts
+// src/app.ts
 var wrap = document.getElementById("scene");
 var canvas = document.getElementById("view");
 var fire = document.getElementById("fire");
@@ -3915,7 +3915,6 @@ var hintEl = document.getElementById("hint");
 var hintWrap = document.getElementById("hint-wrap");
 var panel = document.getElementById("panel");
 var ctx = canvas.getContext("2d");
-var params = { ...DEFAULT_PARAMS };
 var PUBLISHED = {
   altitude: 110,
   jetScale: 0.6,
@@ -3923,8 +3922,8 @@ var PUBLISHED = {
   flameStyle: "realistic",
   afterburner: 1
 };
-for (const k of Object.keys(PUBLISHED))
-  params[k] = PUBLISHED[k];
+var INITIAL = { ...DEFAULT_PARAMS, ...PUBLISHED };
+var params = { ...INITIAL };
 var pixelSize = 3;
 var showHint = true;
 var touchControls = "auto";
@@ -3942,6 +3941,7 @@ var image = null;
 var hintTimer = 0;
 var hintOn = true;
 var hintMode = scene.view;
+var booted = false;
 var KEYS = Object.keys(DEFAULT_PARAMS);
 var FLY = {
   ArrowLeft: "left",
@@ -3987,6 +3987,51 @@ var paintHint = () => {
   hintWrap.className = `hint-wrap ${buttons() || mode === "cockpit" ? "top" : "bottom"}`;
   hintEl.textContent = hintFor(mode, padInput || (buttons() ? "touch" : "pointer"), Boolean(params.invertY));
 };
+var b64encode = (s) => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+var b64decode = (s) => decodeURIComponent(escape(atob(s.replace(/-/g, "+").replace(/_/g, "/"))));
+var PROP_BASE = { pixelSize: 3, showHint: true, touchControls: "auto" };
+function snapshot() {
+  const d = {};
+  for (const k of Object.keys(params)) {
+    if (JSON.stringify(params[k]) !== JSON.stringify(INITIAL[k]))
+      d[k] = params[k];
+  }
+  if (pixelSize !== PROP_BASE.pixelSize)
+    d.pixelSize = pixelSize;
+  if (showHint !== PROP_BASE.showHint)
+    d.showHint = showHint;
+  if (touchControls !== PROP_BASE.touchControls)
+    d.touchControls = touchControls;
+  return d;
+}
+var hashTimer = 0;
+function saveHash() {
+  const d = snapshot();
+  window.clearTimeout(hashTimer);
+  hashTimer = window.setTimeout(() => {
+    const h = Object.keys(d).length ? "#p=" + b64encode(JSON.stringify(d)) : "";
+    history.replaceState(null, "", location.pathname + location.search + h);
+  }, 250);
+}
+function loadHash() {
+  const m = location.hash.match(/#p=([A-Za-z0-9_-]+)/);
+  if (!m)
+    return;
+  try {
+    const d = JSON.parse(b64decode(m[1]));
+    for (const k of Object.keys(d)) {
+      if (k === "pixelSize" && typeof d[k] === "number")
+        pixelSize = d[k];
+      else if (k === "showHint" && typeof d[k] === "boolean")
+        showHint = d[k];
+      else if (k === "touchControls" && ["auto", "on", "off"].includes(d[k]))
+        touchControls = d[k];
+      else if (k in DEFAULT_PARAMS)
+        params[k] = d[k];
+    }
+  } catch {}
+}
+loadHash();
 var layout = () => {
   const cw = wrap.clientWidth;
   const ch = wrap.clientHeight;
@@ -4112,6 +4157,10 @@ var frame = (now) => {
   }
   if (fire && layer)
     layer.draw(flames.count, flames.data, fire.width / scene.width, now / 1000);
+  if (!booted) {
+    booted = true;
+    document.getElementById("boot")?.classList.add("gone");
+  }
 };
 var typing = (e) => {
   const el = e.target;
@@ -4120,6 +4169,23 @@ var typing = (e) => {
 var onKey = (e) => {
   if (typing(e))
     return;
+  if (e.metaKey || e.ctrlKey || e.altKey)
+    return;
+  if (e.code === "KeyF") {
+    e.preventDefault();
+    toggleFullscreen();
+    return;
+  }
+  if (e.code === "KeyR") {
+    e.preventDefault();
+    resetLook();
+    return;
+  }
+  if (e.code === "KeyH") {
+    e.preventDefault();
+    document.body.classList.toggle("panel-open");
+    return;
+  }
   if (e.code === "Space" || e.key === " ") {
     e.preventDefault();
     if (e.repeat)
@@ -4241,15 +4307,41 @@ function nextView() {
   revealHint(scene.view, 7);
   wrap.focus({ preventScroll: true });
 }
+function toggleFullscreen() {
+  if (document.fullscreenElement)
+    document.exitFullscreen?.();
+  else
+    document.documentElement.requestFullscreen?.();
+}
+function paintFullscreen() {
+  const b = document.getElementById("fs");
+  if (b)
+    b.textContent = document.fullscreenElement ? "Exit" : "Full";
+}
+function resetLook() {
+  Object.assign(params, INITIAL);
+  pixelSize = PROP_BASE.pixelSize;
+  showHint = PROP_BASE.showHint;
+  touchControls = PROP_BASE.touchControls;
+  scene.setParams(params);
+  buildPanel();
+  layout();
+  paintHint();
+  paintBoost();
+  saveHash();
+  revealHint(scene.view, 7);
+}
 function apply(next) {
   Object.assign(params, next);
   if (noFire)
     params.flameStyle = "pixel";
   scene.setParams(params);
   paintHint();
+  saveHash();
 }
 function buildPanel() {
   const host = document.getElementById("panel-body");
+  host.innerHTML = "";
   STORY.forEach((section) => {
     const h = document.createElement("h3");
     h.textContent = section.title;
@@ -4275,6 +4367,7 @@ function buildControl(c) {
       if (c.prop === "showHint") {
         showHint = input.checked;
         paintHint();
+        saveHash();
       } else
         apply({ [c.prop]: input.checked });
     });
@@ -4296,6 +4389,7 @@ function buildControl(c) {
       if (c.prop === "pixelSize") {
         pixelSize = v;
         layout();
+        saveHash();
       } else
         apply({ [c.prop]: v });
     });
@@ -4315,6 +4409,7 @@ function buildControl(c) {
         if (c.prop === "touchControls") {
           touchControls = opt;
           paintHint();
+          saveHash();
         } else
           apply({ [c.prop]: opt });
       });
@@ -4382,6 +4477,12 @@ function start() {
   toggle.addEventListener("click", () => document.body.classList.toggle("panel-open"));
   const close = document.getElementById("panel-close");
   close.addEventListener("click", () => document.body.classList.remove("panel-open"));
+  const resetBtn = document.getElementById("reset");
+  resetBtn.addEventListener("click", resetLook);
+  const fs = document.getElementById("fs");
+  fs.addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", paintFullscreen);
+  paintFullscreen();
   if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
     fingerScreen = true;
     document.body.classList.add("touch");

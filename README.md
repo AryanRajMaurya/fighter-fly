@@ -14,8 +14,12 @@ buffer and scaled up with hard pixels. No engine.
 - **Gamepad** — left stick flies, Cross rolls, R2 thrusters, Triangle changes view
 - **Touch** — drag to steer, tap to roll, on-screen View / Boost buttons
 
+Extras: **F** fullscreen, **R** reset to the original look, **H** toggle the panel.
+Every setting is written to the URL hash, so a look can be copied and shared.
+
 The **Controls** button (top right) opens all 34 settings from the original
-fragment, in the same sections, with the same ranges and defaults.
+fragment, in the same sections, with the same ranges and defaults. On a phone
+the panel becomes a bottom sheet.
 
 ## Run locally
 
